@@ -104,6 +104,7 @@ extension Array where Element == UIImage {
                 case .completed:
                     print("Successfully finished writing video \(url)")
                     promise(.success(url))
+                    sSaveVideoToPhotoGallery.saveVideoToPhotoGallery(url: url)
                     break
                 default:
                     let error = writer.error ?? UIImagesToVideoError.internalError
@@ -114,4 +115,22 @@ extension Array where Element == UIImage {
         }
     }
     
+}
+
+
+class SaveVideoToPhotoGallery {
+    static func saveVideoToPhotoGallery(url: URL) {
+        PHPhotoLibrary.requestAuthorization { status in
+            guard status == .authorized else { return }
+            PHPhotoLibrary.shared().performChanges({
+                PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
+            }) { success, error in
+                if success {
+                    print("Video saved")
+                } else {
+                    print("Video save failed: \(error?.localizedDescription ?? "error")")
+                }
+            }
+        }
+    }
 }
