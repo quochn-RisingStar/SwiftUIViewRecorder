@@ -2,6 +2,7 @@ import AVFoundation
 import UIKit
 import Combine
 import CoreMedia
+import Photos
 
 extension Array where Element == UIImage {
     
@@ -104,7 +105,7 @@ extension Array where Element == UIImage {
                 case .completed:
                     print("Successfully finished writing video \(url)")
                     promise(.success(url))
-                    sSaveVideoToPhotoGallery.saveVideoToPhotoGallery(url: url)
+                    SaveVideoToPhotoGallery.saveVideoToPhotoGallery(url: url)
                     break
                 default:
                     let error = writer.error ?? UIImagesToVideoError.internalError
