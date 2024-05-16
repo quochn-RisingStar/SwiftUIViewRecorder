@@ -99,6 +99,7 @@ extension Array where Element == UIImage {
                     frameIndex += 1
                 }
             }
+            self.removeAll()
         
             writer.finishWriting {
                 switch writer.status {
