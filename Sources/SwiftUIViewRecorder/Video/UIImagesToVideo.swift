@@ -92,7 +92,7 @@ extension Array where Element == UIImage {
             input.requestMediaDataWhenReady(on: DispatchQueue(label: "mediaInputQueue")) {
             while input.isReadyForMoreMediaData, frameIndex < self.count {
                 autoreleasepool {
-                    let image = self.loadImage(at: frameIndex)  // Custom method to load image on demand
+                    let image = self[frameIndex]  // Custom method to load image on demand
                     if let buffer = image.toSampleBuffer(frameIndex: frameIndex, framesPerSecond: framesPerSecond) {
                         let presentationTime = CMTimeMultiply(frameDuration, multiplier: Int32(frameIndex))
                         pixelAdaptor.append(CMSampleBufferGetImageBuffer(buffer)!, withPresentationTime: presentationTime)
