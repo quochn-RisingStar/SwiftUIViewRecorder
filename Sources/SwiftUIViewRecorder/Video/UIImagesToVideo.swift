@@ -81,22 +81,21 @@ extension Array where Element == UIImage {
                 return
             }
             
-            let pixelAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input, sourcePixelBufferAttributes: pixelAdaptorAttributes)
-
+            let pixelAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input,
+                                                                    sourcePixelBufferAttributes: pixelAdaptorAttributes)
+            
             writer.startWriting()
             writer.startSession(atSourceTime: CMTime.zero)
-
-            let frameDuration = CMTimeMake(value: 1, timescale: Int32(framesPerSecond))
+            
             var frameIndex: Int = 0
-
-            input.requestMediaDataWhenReady(on: DispatchQueue(label: "mediaInputQueue")) {
-            while input.isReadyForMoreMediaData, frameIndex < self.count {
-                autoreleasepool {
-                    let image = self[frameIndex]  // Custom method to load image on demand
-                    if let buffer = image.toSampleBuffer(frameIndex: frameIndex, framesPerSecond: framesPerSecond) {
-                        let presentationTime = CMTimeMultiply(frameDuration, multiplier: Int32(frameIndex))
-                        pixelAdaptor.append(CMSampleBufferGetImageBuffer(buffer)!, withPresentationTime: presentationTime)
+            while frameIndex < self.count {
+                if (input.isReadyForMoreMediaData) {
+                    if let buffer = self[frameIndex].toSampleBuffer(frameIndex: frameIndex,
+                                                                    framesPerSecond: framesPerSecond) {
+                        pixelAdaptor.append(CMSampleBufferGetImageBuffer(buffer)!,
+                                            withPresentationTime: CMSampleBufferGetOutputPresentationTimeStamp(buffer))
                     }
+                    
                     frameIndex += 1
                 }
             }
@@ -114,9 +113,9 @@ extension Array where Element == UIImage {
                     promise(.failure(error))
                 }
             }
-         }
-      }
-   }
+        }
+    }
+    
 }
 
 
