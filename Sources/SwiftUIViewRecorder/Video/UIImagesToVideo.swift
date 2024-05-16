@@ -114,9 +114,9 @@ extension Array where Element == UIImage {
                     promise(.failure(error))
                 }
             }
-        }
-    }
-    
+         }
+      }
+   }
 }
 
 
