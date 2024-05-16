@@ -81,13 +81,14 @@ extension Array where Element == UIImage {
                 return
             }
             
-            let pixelAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input,
-                                                                    sourcePixelBufferAttributes: pixelAdaptorAttributes)
-            
+            let pixelAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input, sourcePixelBufferAttributes: pixelAdaptorAttributes)
+
             writer.startWriting()
             writer.startSession(atSourceTime: CMTime.zero)
-            
+
+            let frameDuration = CMTimeMake(value: 1, timescale: Int32(framesPerSecond))
             var frameIndex: Int = 0
+
             input.requestMediaDataWhenReady(on: DispatchQueue(label: "mediaInputQueue")) {
             while input.isReadyForMoreMediaData, frameIndex < self.count {
                 autoreleasepool {
@@ -98,7 +99,6 @@ extension Array where Element == UIImage {
                     }
                     frameIndex += 1
                 }
-            }
             }
         
             writer.finishWriting {
