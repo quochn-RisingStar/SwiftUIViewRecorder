@@ -88,18 +88,17 @@ extension Array where Element == UIImage {
             writer.startSession(atSourceTime: CMTime.zero)
             
             var frameIndex: Int = 0
-            while frameIndex < self.count {
-                if (input.isReadyForMoreMediaData) {
-                    if let buffer = self[frameIndex].toSampleBuffer(frameIndex: frameIndex,
-                                                                    framesPerSecond: framesPerSecond) {
-                        pixelAdaptor.append(CMSampleBufferGetImageBuffer(buffer)!,
-                                            withPresentationTime: CMSampleBufferGetOutputPresentationTimeStamp(buffer))
+            input.requestMediaDataWhenReady(on: DispatchQueue(label: "mediaInputQueue")) {
+            while input.isReadyForMoreMediaData, frameIndex < self.count {
+                autoreleasepool {
+                    let image = self.loadImage(at: frameIndex)  // Custom method to load image on demand
+                    if let buffer = image.toSampleBuffer(frameIndex: frameIndex, framesPerSecond: framesPerSecond) {
+                        let presentationTime = CMTimeMultiply(frameDuration, multiplier: Int32(frameIndex))
+                        pixelAdaptor.append(CMSampleBufferGetImageBuffer(buffer)!, withPresentationTime: presentationTime)
                     }
-                    
                     frameIndex += 1
                 }
             }
-            self.removeAll()
         
             writer.finishWriting {
                 switch writer.status {
